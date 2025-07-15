@@ -1,5 +1,3 @@
-const { Client } = require('@notionhq/client');
-
 exports.handler = async (event, context) => {
   // Set CORS headers
   const headers = {
@@ -18,19 +16,19 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Initialize Notion client with API key from environment variable
-    const notion = new Client({
-      auth: process.env.NOTION_API_KEY,
-    });
-
+    const apiKey = process.env.NOTION_API_KEY;
     const databaseId = process.env.NOTION_DATABASE_ID;
 
-    if (!process.env.NOTION_API_KEY || !databaseId) {
+    if (!apiKey || !databaseId) {
       return {
         statusCode: 500,
         headers,
         body: JSON.stringify({
           error: 'Notion API key or database ID not configured',
+          debug: {
+            hasApiKey: !!apiKey,
+            hasDbId: !!databaseId
+          }
         }),
       };
     }
@@ -38,21 +36,34 @@ exports.handler = async (event, context) => {
     const { action } = event.queryStringParameters || {};
     
     if (event.httpMethod === 'GET' && action === 'query') {
-      // Query database entries
-      const response = await notion.databases.query({
-        database_id: databaseId,
-        sorts: [
-          {
-            property: 'Timestamp',
-            direction: 'descending',
-          },
-        ],
+      // Query database entries using fetch
+      const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify({
+          sorts: [
+            {
+              property: 'Timestamp',
+              direction: 'descending',
+            },
+          ],
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Notion API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(response.results),
+        body: JSON.stringify(data.results),
       };
     }
 
@@ -60,7 +71,7 @@ exports.handler = async (event, context) => {
       // Create new entry
       const data = JSON.parse(event.body);
       
-      const response = await notion.pages.create({
+      const pageData = {
         parent: { database_id: databaseId },
         properties: {
           'Title': {
@@ -111,12 +122,29 @@ exports.handler = async (event, context) => {
             }
           }
         }
+      };
+
+      const response = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28',
+        },
+        body: JSON.stringify(pageData),
       });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Notion API error: ${response.status} ${response.statusText} - ${errorData}`);
+      }
+
+      const result = await response.json();
 
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(response),
+        body: JSON.stringify(result),
       };
     }
 
@@ -124,7 +152,7 @@ exports.handler = async (event, context) => {
       statusCode: 400,
       headers,
       body: JSON.stringify({
-        error: 'Invalid request',
+        error: 'Invalid request. Use ?action=query or ?action=create',
       }),
     };
 
@@ -136,6 +164,7 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         error: error.message,
+        stack: error.stack
       }),
     };
   }
