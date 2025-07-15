@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Trip Tracker - Home</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 300;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .feature-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .feature-card p {
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+        
+        .btn.secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .btn.secondary:hover {
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.6);
+        }
+        
+        .setup-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 60px 20px;
+            margin: 40px 0;
+        }
+        
+        .setup-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .setup-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .step {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px 20px;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        
+        .step h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .step p {
+            opacity: 0.9;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.8;
+        }
+        
+        .notion-setup {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid rgba(255, 193, 7, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+        
+        .notion-setup h3 {
+            color: #FFC107;
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            text-align: left;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+            }
+            
+            .btn {
+                display: block;
+                margin: 10px auto;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>🇬🇧 UK Trip Tracker</h1>
+        <p>Track your UK adventures with GPS logging, real-time Notion sync, and beautiful shareable trip cards. Perfect for exploring London, Scotland, Manchester and beyond!</p>
+        
+        <div style="margin-top: 40px;">
+            <a href="mobile-app.html" class="btn">📱 Start Tracking</a>
+            <a href="dashboard.html" class="btn secondary">📊 View Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="features">
+        <div class="feature-card">
+            <span class="feature-icon">📍</span>
+            <h3>GPS Location Logging</h3>
+            <p>One-tap location capture with automatic location detection, transport mode recognition, and 10-word descriptions for quick journaling.</p>
+            <a href="mobile-app.html" class="btn">Start Logging</a>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">🔄</span>
+            <h3>Real-time Notion Sync</h3>
+            <p>Automatically sync your travels to Notion database with offline queue support. Never lose your travel memories, even without internet.</p>
+            <a href="#setup" class="btn secondary">Setup Guide</a>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">🗺️</span>
+            <h3>Interactive Dashboard</h3>
+            <p>Visualize your journey with real-time maps, route tracking, statistics, and filtering by day, city, or transport mode.</p>
+            <a href="dashboard.html" class="btn">View Dashboard</a>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">📸</span>
+            <h3>Trip Card Generator</h3>
+            <p>Create beautiful, shareable JPEG cards of your adventures. Perfect for social media with multiple sizes and UK-themed designs.</p>
+            <a href="trip-card-generator.html" class="btn">Generate Cards</a>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">🇬🇧</span>
+            <h3>UK Intelligence</h3>
+            <p>Smart UK-specific features including postcode detection, London zone mapping, attraction recognition, and transport optimization.</p>
+            <a href="mobile-app.html" class="btn secondary">Try Features</a>
+        </div>
+        
+        <div class="feature-card">
+            <span class="feature-icon">📱</span>
+            <h3>PWA Support</h3>
+            <p>Install as a native app on your phone. Works offline with background sync, perfect for exploring without constant internet.</p>
+            <a href="#install" class="btn">Install Guide</a>
+        </div>
+    </div>
+    
+    <div class="setup-section" id="setup">
+        <div class="setup-container">
+            <h2>🚀 Quick Setup Guide</h2>
+            <p>Get started with your UK Trip Tracker in just a few minutes!</p>
+            
+            <div class="notion-setup">
+                <h3>⚠️ Notion Configuration Required</h3>
+                <p>To sync your trips to Notion, you'll need to configure your API credentials:</p>
+                
+                <div class="code-block">
+// In config.js, replace:
+NOTION: {
+    API_KEY: 'YOUR_NOTION_API_KEY',
+    DATABASE_ID: 'YOUR_DATABASE_ID'
+}
+                </div>
+                
+                <p><strong>Get your Notion API key:</strong> <a href="https://developers.notion.com/docs/create-a-notion-integration" target="_blank" style="color: #FFC107;">developers.notion.com</a></p>
+            </div>
+            
+            <div class="setup-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h4>Create Notion Integration</h4>
+                    <p>Visit notion.com/my-integrations and create a new integration to get your API key</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h4>Create Database</h4>
+                    <p>Create a new Notion database with the required properties (Title, Timestamp, Latitude, Longitude, etc.)</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h4>Configure App</h4>
+                    <p>Update config.js with your API key and database ID, then start tracking your adventures!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="setup-section" id="install">
+        <div class="setup-container">
+            <h2>📱 Installation Guide</h2>
+            <p>Install UK Trip Tracker on your devices for the best experience</p>
+            
+            <div class="setup-steps">
+                <div class="step">
+                    <div class="step-number">📱</div>
+                    <h4>Mobile Installation</h4>
+                    <p><strong>iOS:</strong> Open in Safari → Share → Add to Home Screen<br>
+                    <strong>Android:</strong> Open in Chrome → Menu → Add to Home Screen</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">💻</div>
+                    <h4>Desktop Setup</h4>
+                    <p><strong>Local:</strong> Run <code>npm start</code> after configuring<br>
+                    <strong>Deploy:</strong> Upload to Netlify/Vercel for online access</p>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">🌐</div>
+                    <h4>Multi-Device Sync</h4>
+                    <p>Configure the same Notion database on all devices to sync your trips across phones, tablets, and computers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>🇬🇧 Built for UK Adventures • Generated with Claude Code</p>
+        <p>Open source and privacy-focused • Your data stays in your Notion workspace</p>
+    </div>
+    
+    <script>
+        // Add install prompt functionality
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show custom install button
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '📱 Install App';
+            installBtn.className = 'btn';
+            installBtn.style.position = 'fixed';
+            installBtn.style.bottom = '20px';
+            installBtn.style.right = '20px';
+            installBtn.style.zIndex = '1000';
+            
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.remove();
+                    }
+                    deferredPrompt = null;
+                }
+            });
+            
+            document.body.appendChild(installBtn);
+        });
+    </script>
+</body>
+</html>

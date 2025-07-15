@@ -1,0 +1,22 @@
+{
+  "name": "uk-trip-tracker",
+  "version": "1.0.0",
+  "description": "UK Trip Tracker with Notion Integration - GPS logging, real-time sync, and shareable trip cards",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 8080 -c-1",
+    "dev": "npx http-server . -p 8080 -c-1 --cors",
+    "build": "echo 'Static build - files ready for deployment'",
+    "test": "echo 'Tests not configured yet'"
+  },
+  "keywords": ["travel", "gps", "notion", "trip-tracker", "uk"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
