@@ -26,109 +26,39 @@ class NotionClient {
     }
     
     async makeRequest(endpoint, options = {}) {
-        const url = `${this.baseUrl}${endpoint}`;
-        const headers = {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-            'Notion-Version': this.apiVersion,
-            ...options.headers
-        };
+        // Use Netlify function instead of direct API calls
+        const isProduction = window.location.hostname !== 'localhost';
+        const baseUrl = isProduction ? '/.netlify/functions' : 'http://localhost:8888/.netlify/functions';
         
         try {
-            const response = await fetch(url, {
+            const response = await fetch(`${baseUrl}/notion-proxy${endpoint}`, {
                 ...options,
-                headers
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
             });
             
             if (!response.ok) {
-                throw new Error(`Notion API error: ${response.status} ${response.statusText}`);
+                throw new Error(`Notion proxy error: ${response.status} ${response.statusText}`);
             }
             
             return await response.json();
         } catch (error) {
-            console.error('Notion API request failed:', error);
+            console.error('Notion proxy request failed:', error);
             throw error;
         }
     }
     
     async createEntry(locationData) {
-        const entry = {
-            parent: { database_id: this.databaseId },
-            properties: {
-                'Title': {
-                    title: [{
-                        text: {
-                            content: `📍 ${locationData.location} - ${new Date(locationData.timestamp).toLocaleTimeString()}`
-                        }
-                    }]
-                },
-                'Timestamp': {
-                    date: {
-                        start: new Date(locationData.timestamp).toISOString()
-                    }
-                },
-                'Latitude': {
-                    number: parseFloat(locationData.latitude)
-                },
-                'Longitude': {
-                    number: parseFloat(locationData.longitude)
-                },
-                'Location': {
-                    rich_text: [{
-                        text: {
-                            content: locationData.location || 'Unknown Location'
-                        }
-                    }]
-                },
-                'Description': {
-                    rich_text: [{
-                        text: {
-                            content: locationData.description || ''
-                        }
-                    }]
-                },
-                'Day': {
-                    select: {
-                        name: locationData.day || 'Day 1'
-                    }
-                },
-                'City': {
-                    select: {
-                        name: locationData.city || 'Other'
-                    }
-                },
-                'Transport_Mode': {
-                    select: {
-                        name: locationData.transport_mode || 'Walking'
-                    }
-                }
-            }
-        };
-        
-        if (locationData.weather) {
-            entry.properties['Weather'] = {
-                rich_text: [{
-                    text: {
-                        content: locationData.weather
-                    }
-                }]
-            };
-        }
-        
-        if (locationData.photo_url) {
-            entry.properties['Photo_URL'] = {
-                url: locationData.photo_url
-            };
-        }
-        
         if (!navigator.onLine) {
-            return this.queueOfflineEntry(entry);
+            return this.queueOfflineEntry(locationData);
         }
         
         try {
-            const response = await this.makeRequest('/pages', {
+            const response = await this.makeRequest('?action=create', {
                 method: 'POST',
-                body: JSON.stringify(entry)
+                body: JSON.stringify(locationData)
             });
             
             // Update sync status
@@ -136,15 +66,15 @@ class NotionClient {
             return response;
         } catch (error) {
             console.error('Failed to create Notion entry:', error);
-            this.queueOfflineEntry(entry);
+            this.queueOfflineEntry(locationData);
             throw error;
         }
     }
     
-    queueOfflineEntry(entry) {
+    queueOfflineEntry(locationData) {
         this.offlineQueue.push({
-            ...entry,
-            timestamp: Date.now(),
+            ...locationData,
+            queued_timestamp: Date.now(),
             id: Date.now().toString()
         });
         localStorage.setItem('offlineQueue', JSON.stringify(this.offlineQueue));
@@ -162,11 +92,11 @@ class NotionClient {
         const queue = [...this.offlineQueue];
         this.offlineQueue = [];
         
-        for (const entry of queue) {
+        for (const locationData of queue) {
             try {
-                await this.makeRequest('/pages', {
+                await this.makeRequest('?action=create', {
                     method: 'POST',
-                    body: JSON.stringify(entry)
+                    body: JSON.stringify(locationData)
                 });
                 
                 // Remove from queue on success
@@ -174,7 +104,7 @@ class NotionClient {
             } catch (error) {
                 console.error('Failed to sync offline entry:', error);
                 // Re-add to queue on failure
-                this.offlineQueue.push(entry);
+                this.offlineQueue.push(locationData);
             }
         }
         
@@ -184,20 +114,11 @@ class NotionClient {
     
     async queryEntries(filter = {}) {
         try {
-            const response = await this.makeRequest(`/databases/${this.databaseId}/query`, {
-                method: 'POST',
-                body: JSON.stringify({
-                    sorts: [
-                        {
-                            property: 'Timestamp',
-                            direction: 'descending'
-                        }
-                    ],
-                    ...filter
-                })
+            const response = await this.makeRequest('?action=query', {
+                method: 'GET'
             });
             
-            return response.results;
+            return response;
         } catch (error) {
             console.error('Failed to query Notion entries:', error);
             throw error;
@@ -205,9 +126,7 @@ class NotionClient {
     }
     
     async getRecentEntries(limit = 10) {
-        return await this.queryEntries({
-            page_size: limit
-        });
+        return await this.queryEntries();
     }
     
     updateSyncStatus(status) {
@@ -219,9 +138,8 @@ class NotionClient {
     
     // Validate configuration
     isConfigured() {
-        return this.apiKey !== 'YOUR_NOTION_API_KEY' && 
-               this.databaseId !== 'YOUR_DATABASE_ID' &&
-               this.apiKey && this.databaseId;
+        // For Netlify function, we assume it's configured if we can reach the function
+        return true;
     }
     
     // Get sync statistics
