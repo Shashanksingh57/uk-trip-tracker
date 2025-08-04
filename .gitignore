@@ -71,3 +71,9 @@ build/
 # Temporary files
 tmp/
 temp/
+# Local Netlify folder
+.netlify
+
+# Environment variables
+.env
+.env.*

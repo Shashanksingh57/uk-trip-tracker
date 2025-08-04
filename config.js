@@ -2,9 +2,10 @@
 const CONFIG = {
     // Notion Configuration
     NOTION: {
-        // Using your existing Notion integration token
-        API_KEY: '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', // UK Trip Tracker integration
-        DATABASE_ID: '033242e49e7d43bb9871d98d731344d9', // UK Trip Tracker database (working format)
+        // These values should be set via environment variables on your server
+        // For local development, the Netlify functions will use .env file
+        API_KEY: 'YOUR_NOTION_API_KEY', // Set via environment variable
+        DATABASE_ID: 'YOUR_DATABASE_ID', // Set via environment variable
         API_VERSION: '2022-06-28',
         BASE_URL: 'https://api.notion.com/v1',
         RATE_LIMIT: {
@@ -29,7 +30,8 @@ const CONFIG = {
         DEFAULT_CENTER: [54.5, -2.5], // UK center
         DEFAULT_ZOOM: 6,
         TILE_URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        ATTRIBUTION: '© OpenStreetMap contributors'
+        ATTRIBUTION: '© OpenStreetMap contributors',
+        MAPBOX_ACCESS_TOKEN: 'pk.eyJ1Ijoic2hhc2hhbms1NyIsImEiOiJjbWR1bGFmeWgwNnR2Mm9xNW95eHk3dnJmIn0.jv2hGloCijtJQbGb3Vkz9A'
     },
     
     // UK Specific Configuration

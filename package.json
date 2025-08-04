@@ -9,12 +9,20 @@
     "build": "echo 'Static build - files ready for deployment'",
     "test": "echo 'Tests not configured yet'"
   },
-  "keywords": ["travel", "gps", "notion", "trip-tracker", "uk"],
+  "keywords": [
+    "travel",
+    "gps",
+    "notion",
+    "trip-tracker",
+    "uk"
+  ],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
     "@notionhq/client": "^2.2.15",
-    "leaflet": "^1.9.4"
+    "@turf/turf": "^7.2.0",
+    "leaflet": "^1.9.4",
+    "mapbox-gl": "^3.14.0"
   },
   "devDependencies": {
     "http-server": "^14.1.1"

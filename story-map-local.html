@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My UK Trip Story - Local Test</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+        .sidebar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 320px;
+            z-index: 1;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<div class='sidebar'>
+    <h1>Story Map Test</h1>
+    <div id="status">Loading...</div>
+</div>
+
+<script>
+// Simple test to verify Mapbox is working
+const statusDiv = document.getElementById('status');
+
+// Test data - a few UK locations
+const testLocations = [
+    { latitude: 51.5074, longitude: -0.1278, location: "London", description: "Starting point" },
+    { latitude: 53.4808, longitude: -2.2426, location: "Manchester", description: "Second stop" },
+    { latitude: 55.9533, longitude: -3.1883, location: "Edinburgh", description: "Final destination" }
+];
+
+try {
+    // Check if Mapbox token is configured
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic2hhc2hhbms1NyIsImEiOiJjbWR1bGFmeWgwNnR2Mm9xNW95eHk3dnJmIn0.jv2hGloCijtJQbGb3Vkz9A';
+    
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-2.5, 54.5], // UK center
+        zoom: 6
+    });
+
+    map.on('load', () => {
+        statusDiv.innerHTML = '<span style="color: green;">✓ Map loaded successfully!</span><br>';
+        
+        // Add markers for test locations
+        testLocations.forEach((loc, index) => {
+            new mapboxgl.Marker()
+                .setLngLat([loc.longitude, loc.latitude])
+                .setPopup(new mapboxgl.Popup().setHTML(`<h3>${loc.location}</h3><p>${loc.description}</p>`))
+                .addTo(map);
+                
+            statusDiv.innerHTML += `✓ Added marker: ${loc.location}<br>`;
+        });
+        
+        // Draw a line between locations
+        const coordinates = testLocations.map(loc => [loc.longitude, loc.latitude]);
+        
+        map.addSource('route', {
+            'type': 'geojson',
+            'data': {
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': coordinates
+                }
+            }
+        });
+        
+        map.addLayer({
+            'id': 'route',
+            'type': 'line',
+            'source': 'route',
+            'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+            },
+            'paint': {
+                'line-color': '#007cbf',
+                'line-width': 4
+            }
+        });
+        
+        statusDiv.innerHTML += '✓ Route drawn successfully!<br>';
+        statusDiv.innerHTML += '<br><strong>Map is working! Now check the main story-map.html</strong>';
+    });
+
+    map.on('error', (e) => {
+        statusDiv.innerHTML = `<span class="error">Map error: ${e.error.message}</span>`;
+    });
+
+} catch (error) {
+    statusDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+}
+</script>
+
+</body>
+</html>
